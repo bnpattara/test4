@@ -1,0 +1,69 @@
+{% comment %}
+  Product Recommendations
+  Parameters:
+    - product: The current product
+    - limit: Number of recommendations to show
+    - title: Section title
+{% endcomment %}
+
+{% assign limit = limit | default: 4 %}
+{% assign title = title | default: 'You may also like' %}
+
+<div class="product-recommendations" data-product-id="{{ product.id }}" data-limit="{{ limit }}">
+  <h2 class="product-recommendations__title">{{ title }}</h2>
+  
+  <div class="product-recommendations__grid">
+    {% for recommendation in recommendations.products limit: limit %}
+      {% render 'product-card', product: recommendation %}
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .product-recommendations {
+    padding: var(--spacing-section) 0;
+  }
+
+  .product-recommendations__title {
+    margin: 0 0 var(--spacing-section);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-heading);
+    text-align: center;
+  }
+
+  .product-recommendations__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-base);
+  }
+
+  @media (max-width: 768px) {
+    .product-recommendations__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productRecommendations = document.querySelector('.product-recommendations');
+    if (!productRecommendations) return;
+
+    const productId = productRecommendations.dataset.productId;
+    const limit = productRecommendations.dataset.limit;
+
+    fetch(`/recommendations/products?product_id=${productId}&limit=${limit}`)
+      .then(response => response.text())
+      .then(html => {
+        const recommendations = new DOMParser().parseFromString(html, 'text/html');
+        const recommendationsGrid = productRecommendations.querySelector('.product-recommendations__grid');
+        
+        if (recommendationsGrid) {
+          recommendationsGrid.innerHTML = recommendations.querySelector('.product-recommendations__grid').innerHTML;
+        }
+      })
+      .catch(error => {
+        console.error('Error loading product recommendations:', error);
+      });
+  });
+</script> 

@@ -1,0 +1,247 @@
+{% comment %}
+  Product Reviews
+  Parameters:
+    - product: The product object
+    - show_rating: Boolean to show rating
+    - show_reviews: Boolean to show reviews
+    - show_form: Boolean to show review form
+{% endcomment %}
+
+<div class="product-reviews" data-product-id="{{ product.id }}">
+  {% if show_rating %}
+    <div class="product-reviews__rating">
+      <div class="product-reviews__rating-stars">
+        {% assign rating = product.metafields.reviews.rating.value.rating | default: 0 %}
+        {% assign max_rating = product.metafields.reviews.rating.value.scale_max | default: 5 %}
+        {% assign rating_percentage = rating | times: 100 | divided_by: max_rating %}
+        
+        <div class="product-reviews__rating-stars-background">
+          {% for i in (1..max_rating) %}
+            {% render 'icon-star' %}
+          {% endfor %}
+        </div>
+        <div class="product-reviews__rating-stars-foreground" style="width: {{ rating_percentage }}%">
+          {% for i in (1..max_rating) %}
+            {% render 'icon-star' %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="product-reviews__rating-count">
+        {{ product.metafields.reviews.rating_count | default: 0 }} reviews
+      </div>
+    </div>
+  {% endif %}
+
+  {% if show_reviews %}
+    <div class="product-reviews__list">
+      {% for review in product.metafields.reviews.reviews.value %}
+        <div class="product-reviews__item">
+          <div class="product-reviews__item-header">
+            <div class="product-reviews__item-author">{{ review.author }}</div>
+            <div class="product-reviews__item-date">{{ review.created_at | date: "%B %d, %Y" }}</div>
+          </div>
+          <div class="product-reviews__item-rating">
+            {% for i in (1..review.rating) %}
+              {% render 'icon-star' %}
+            {% endfor %}
+          </div>
+          <div class="product-reviews__item-title">{{ review.title }}</div>
+          <div class="product-reviews__item-body">{{ review.body }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if show_form %}
+    <div class="product-reviews__form">
+      <h3 class="product-reviews__form-title">Write a review</h3>
+      {% form 'product_review', product %}
+        <div class="product-reviews__form-field">
+          <label for="ReviewTitle">Title</label>
+          <input type="text" id="ReviewTitle" name="review[title]" required>
+        </div>
+
+        <div class="product-reviews__form-field">
+          <label for="ReviewRating">Rating</label>
+          <div class="product-reviews__form-rating">
+            {% for i in (1..5) %}
+              <input type="radio" id="Rating{{ i }}" name="review[rating]" value="{{ i }}" required>
+              <label for="Rating{{ i }}">
+                {% render 'icon-star' %}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="product-reviews__form-field">
+          <label for="ReviewBody">Review</label>
+          <textarea id="ReviewBody" name="review[body]" required></textarea>
+        </div>
+
+        <div class="product-reviews__form-field">
+          <label for="ReviewName">Name</label>
+          <input type="text" id="ReviewName" name="review[author]" required>
+        </div>
+
+        <div class="product-reviews__form-field">
+          <label for="ReviewEmail">Email</label>
+          <input type="email" id="ReviewEmail" name="review[email]" required>
+        </div>
+
+        <button type="submit" class="button button--primary">Submit Review</button>
+      {% endform %}
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .product-reviews {
+    padding: var(--spacing-section) 0;
+  }
+
+  .product-reviews__rating {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-base);
+    margin-bottom: var(--spacing-section);
+  }
+
+  .product-reviews__rating-stars {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .product-reviews__rating-stars-background,
+  .product-reviews__rating-stars-foreground {
+    display: flex;
+    gap: 2px;
+  }
+
+  .product-reviews__rating-stars-foreground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+  }
+
+  .product-reviews__rating-stars svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .product-reviews__rating-stars-background svg {
+    color: var(--color-border);
+  }
+
+  .product-reviews__rating-stars-foreground svg {
+    color: var(--color-warning);
+  }
+
+  .product-reviews__rating-count {
+    color: var(--color-text-muted);
+  }
+
+  .product-reviews__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-base);
+    margin-bottom: var(--spacing-section);
+  }
+
+  .product-reviews__item {
+    padding: var(--spacing-base);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-medium);
+  }
+
+  .product-reviews__item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-reviews__item-author {
+    font-weight: var(--font-weight-heading);
+  }
+
+  .product-reviews__item-date {
+    color: var(--color-text-muted);
+  }
+
+  .product-reviews__item-rating {
+    display: flex;
+    gap: 2px;
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-reviews__item-rating svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-warning);
+  }
+
+  .product-reviews__item-title {
+    font-weight: var(--font-weight-heading);
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-reviews__form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .product-reviews__form-title {
+    margin: 0 0 var(--spacing-base);
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-heading);
+  }
+
+  .product-reviews__form-field {
+    margin-bottom: var(--spacing-base);
+  }
+
+  .product-reviews__form-field label {
+    display: block;
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-reviews__form-field input,
+  .product-reviews__form-field textarea {
+    width: 100%;
+    padding: calc(var(--spacing-base) / 2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .product-reviews__form-field textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  .product-reviews__form-rating {
+    display: flex;
+    gap: var(--spacing-base);
+  }
+
+  .product-reviews__form-rating input {
+    display: none;
+  }
+
+  .product-reviews__form-rating label {
+    cursor: pointer;
+  }
+
+  .product-reviews__form-rating svg {
+    width: 24px;
+    height: 24px;
+    color: var(--color-border);
+    transition: color 0.2s ease;
+  }
+
+  .product-reviews__form-rating input:checked ~ label svg,
+  .product-reviews__form-rating label:hover svg {
+    color: var(--color-warning);
+  }
+</style> 

@@ -1,0 +1,116 @@
+{
+  "site": {
+    "title": "NatureBuff - Sustainable Hygiene for the Wild at Heart",
+    "description": "Eco-friendly, biodegradable hygiene products for adventurers, travelers, and eco-conscious individuals.",
+    "logo": "/assets/images/logo.png",
+    "favicon": "/assets/images/favicon.ico",
+    "contact": {
+      "email": "hello@naturebuff.com",
+      "phone": "+1 (503) 555-1234",
+      "address": "123 Sustainable Way, Portland, OR 97204"
+    },
+    "social": {
+      "instagram": "https://instagram.com",
+      "twitter": "https://twitter.com",
+      "facebook": "https://facebook.com",
+      "pinterest": "https://pinterest.com"
+    }
+  },
+  "colors": {
+    "primary": "#144D3C",
+    "accent": "#EFA567",
+    "background": "#FFFFFF",
+    "foreground": "#333333",
+    "muted": "#F5F5F5",
+    "muted_foreground": "#666666"
+  },
+  "navigation": {
+    "main": [
+      {
+        "title": "Shop",
+        "url": "/shop"
+      },
+      {
+        "title": "About Us",
+        "url": "/about"
+      },
+      {
+        "title": "How It Works",
+        "url": "/how-it-works"
+      }
+    ],
+    "secondary": [
+      {
+        "title": "Journal",
+        "url": "/journal"
+      },
+      {
+        "title": "FAQ",
+        "url": "/faq"
+      },
+      {
+        "title": "Contact",
+        "url": "/contact"
+      }
+    ],
+    "footer": {
+      "shop": [
+        {
+          "title": "Buff Wipes",
+          "url": "/shop?category=wipes"
+        },
+        {
+          "title": "Soap Bars",
+          "url": "/shop?category=soap"
+        },
+        {
+          "title": "All Products",
+          "url": "/shop"
+        }
+      ],
+      "about": [
+        {
+          "title": "Our Story",
+          "url": "/about#story"
+        },
+        {
+          "title": "Sustainability",
+          "url": "/about#sustainability"
+        },
+        {
+          "title": "Meet the Team",
+          "url": "/about#team"
+        }
+      ],
+      "resources": [
+        {
+          "title": "Journal",
+          "url": "/journal"
+        },
+        {
+          "title": "FAQ",
+          "url": "/faq"
+        },
+        {
+          "title": "Contact Us",
+          "url": "/contact"
+        }
+      ],
+      "connect": [
+        {
+          "title": "Instagram",
+          "url": "https://instagram.com"
+        },
+        {
+          "title": "Twitter",
+          "url": "https://twitter.com"
+        },
+        {
+          "title": "Facebook",
+          "url": "https://facebook.com"
+        }
+      ]
+    }
+  }
+}
+

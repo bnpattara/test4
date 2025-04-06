@@ -1,0 +1,331 @@
+{% comment %}
+  Dropdown menu component
+  Accepts:
+  - id: {String} Unique ID for the dropdown
+  - trigger: {String} HTML for the trigger button/content
+  - items: {Array} Array of menu items with label and url
+  - position: {String} Dropdown position ('bottom-left', 'bottom-right', 'top-left', 'top-right') (default: 'bottom-left')
+  - animation: {String} Animation type ('fade', 'slide', 'none') (default: 'fade')
+  - close_on_click: {Boolean} Whether to close when clicking outside (default: true)
+  - close_on_escape: {Boolean} Whether to close when pressing escape (default: true)
+{% endcomment %}
+
+{% assign position = position | default: 'bottom-left' %}
+{% assign animation = animation | default: 'fade' %}
+{% assign close_on_click = close_on_click | default: true %}
+{% assign close_on_escape = close_on_escape | default: true %}
+
+<div
+  class="dropdown"
+  data-dropdown
+  data-dropdown-id="{{ id }}"
+  {% if close_on_click %}data-dropdown-close-on-click{% endif %}
+  {% if close_on_escape %}data-dropdown-close-on-escape{% endif %}
+>
+  <button
+    type="button"
+    class="dropdown__trigger"
+    data-dropdown-trigger
+    aria-expanded="false"
+    aria-controls="dropdown-{{ id }}"
+  >
+    {{ trigger }}
+  </button>
+
+  <div
+    id="dropdown-{{ id }}"
+    class="dropdown__menu dropdown__menu--{{ position }} dropdown__menu--{{ animation }}"
+    data-dropdown-menu
+    role="menu"
+  >
+    <div class="dropdown__menu-inner">
+      {% for item in items %}
+        <a
+          href="{{ item.url }}"
+          class="dropdown__item"
+          role="menuitem"
+          {% if item.external %}
+            target="_blank"
+            rel="noopener noreferrer"
+          {% endif %}
+        >
+          {% if item.icon %}
+            <span class="dropdown__item-icon">
+              {% render item.icon %}
+            </span>
+          {% endif %}
+          <span class="dropdown__item-label">
+            {{ item.label }}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown__trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: var(--color-text);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .dropdown__trigger:hover {
+    color: var(--color-primary);
+  }
+
+  .dropdown__trigger[aria-expanded="true"] {
+    color: var(--color-primary);
+  }
+
+  .dropdown__menu {
+    position: absolute;
+    min-width: 200px;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.5rem);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+
+  .dropdown__menu[data-dropdown-menu-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown__menu--bottom-left {
+    top: 100%;
+    left: 0;
+    transform-origin: top left;
+  }
+
+  .dropdown__menu--bottom-right {
+    top: 100%;
+    right: 0;
+    transform-origin: top right;
+  }
+
+  .dropdown__menu--top-left {
+    bottom: 100%;
+    left: 0;
+    transform-origin: bottom left;
+    transform: translateY(-0.5rem);
+  }
+
+  .dropdown__menu--top-right {
+    bottom: 100%;
+    right: 0;
+    transform-origin: bottom right;
+    transform: translateY(-0.5rem);
+  }
+
+  .dropdown__menu--top-left[data-dropdown-menu-open],
+  .dropdown__menu--top-right[data-dropdown-menu-open] {
+    transform: translateY(0);
+  }
+
+  .dropdown__menu--slide {
+    transform: translateY(1rem);
+  }
+
+  .dropdown__menu--slide[data-dropdown-menu-open] {
+    transform: translateY(0);
+  }
+
+  .dropdown__menu--none {
+    transform: none;
+  }
+
+  .dropdown__menu--none[data-dropdown-menu-open] {
+    transform: none;
+  }
+
+  .dropdown__menu-inner {
+    padding: 0.5rem;
+  }
+
+  .dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+  }
+
+  .dropdown__item:hover {
+    background-color: var(--color-background-hover);
+  }
+
+  .dropdown__item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-muted);
+  }
+
+  .dropdown__item-label {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 767px) {
+    .dropdown__menu {
+      position: fixed;
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-height: 80vh;
+      border-radius: 0.5rem 0.5rem 0 0;
+      transform: translateY(100%);
+    }
+
+    .dropdown__menu[data-dropdown-menu-open] {
+      transform: translateY(0);
+    }
+
+    .dropdown__menu-inner {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script>
+  class Dropdown {
+    constructor(element) {
+      this.element = element;
+      this.id = element.dataset.dropdownId;
+      this.trigger = element.querySelector('[data-dropdown-trigger]');
+      this.menu = element.querySelector('[data-dropdown-menu]');
+      this.items = Array.from(element.querySelectorAll('.dropdown__item'));
+      this.isOpen = false;
+
+      this.init();
+    }
+
+    init() {
+      this.trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        this.toggle();
+      });
+
+      if (this.element.dataset.dropdownCloseOnClick) {
+        document.addEventListener('click', (event) => {
+          if (this.isOpen && !this.element.contains(event.target)) {
+            this.close();
+          }
+        });
+      }
+
+      if (this.element.dataset.dropdownCloseOnEscape) {
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && this.isOpen) {
+            this.close();
+          }
+        });
+      }
+
+      this.items.forEach((item, index) => {
+        item.addEventListener('keydown', (event) => {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            this.focusNextItem(index);
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            this.focusPreviousItem(index);
+          } else if (event.key === 'Home') {
+            event.preventDefault();
+            this.focusFirstItem();
+          } else if (event.key === 'End') {
+            event.preventDefault();
+            this.focusLastItem();
+          }
+        });
+      });
+    }
+
+    toggle() {
+      if (this.isOpen) {
+        this.close();
+      } else {
+        this.open();
+      }
+    }
+
+    open() {
+      this.isOpen = true;
+      this.trigger.setAttribute('aria-expanded', 'true');
+      this.menu.setAttribute('data-dropdown-menu-open', '');
+      this.focusFirstItem();
+    }
+
+    close() {
+      this.isOpen = false;
+      this.trigger.setAttribute('aria-expanded', 'false');
+      this.menu.removeAttribute('data-dropdown-menu-open');
+      this.trigger.focus();
+    }
+
+    focusFirstItem() {
+      this.items[0]?.focus();
+    }
+
+    focusLastItem() {
+      this.items[this.items.length - 1]?.focus();
+    }
+
+    focusNextItem(currentIndex) {
+      const nextIndex = (currentIndex + 1) % this.items.length;
+      this.items[nextIndex]?.focus();
+    }
+
+    focusPreviousItem(currentIndex) {
+      const prevIndex = (currentIndex - 1 + this.items.length) % this.items.length;
+      this.items[prevIndex]?.focus();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropdowns = document.querySelectorAll('[data-dropdown]');
+    dropdowns.forEach(dropdown => new Dropdown(dropdown));
+  });
+
+  // Helper function to open a dropdown by ID
+  window.openDropdown = (id) => {
+    const dropdown = document.querySelector(`[data-dropdown-id="${id}"]`);
+    if (dropdown) {
+      new Dropdown(dropdown).open();
+    }
+  };
+
+  // Helper function to close a dropdown by ID
+  window.closeDropdown = (id) => {
+    const dropdown = document.querySelector(`[data-dropdown-id="${id}"]`);
+    if (dropdown) {
+      new Dropdown(dropdown).close();
+    }
+  };
+</script> 

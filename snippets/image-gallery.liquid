@@ -1,0 +1,291 @@
+{% comment %}
+  Image gallery component
+  Accepts:
+  - images: {Array} Array of image objects
+  - columns: {Number} Number of columns in the grid (default: 3)
+  - spacing: {Number} Spacing between images in pixels (default: 16)
+  - show_captions: {Boolean} Whether to show image captions (default: false)
+  - enable_lightbox: {Boolean} Whether to enable lightbox functionality (default: true)
+{% endcomment %}
+
+{% assign columns = columns | default: 3 %}
+{% assign spacing = spacing | default: 16 %}
+{% assign show_captions = show_captions | default: false %}
+{% assign enable_lightbox = enable_lightbox | default: true %}
+
+<div class="gallery" data-gallery>
+  <div class="gallery__grid" style="--columns: {{ columns }}; --spacing: {{ spacing }}px;">
+    {% for image in images %}
+      <div class="gallery__item">
+        <div class="gallery__image-container">
+          {% if enable_lightbox %}
+            <button
+              type="button"
+              class="gallery__image-button"
+              data-gallery-item="{{ forloop.index0 }}"
+              aria-label="{{ image.alt | default: 'View image' }}"
+            >
+          {% endif %}
+
+          <img
+            src="{{ image | image_url: width: 800 }}"
+            alt="{{ image.alt | escape }}"
+            width="800"
+            height="{{ 800 | divided_by: image.aspect_ratio | round }}"
+            loading="lazy"
+            class="gallery__image"
+          >
+
+          {% if enable_lightbox %}
+            </button>
+          {% endif %}
+
+          {% if show_captions and image.alt != blank %}
+            <div class="gallery__caption">
+              {{ image.alt }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if enable_lightbox %}
+    <div class="gallery__lightbox" data-gallery-lightbox>
+      <button
+        type="button"
+        class="gallery__lightbox-close"
+        data-gallery-close
+        aria-label="{{ 'gallery.close' | t }}"
+      >
+        {% render 'icon-close' %}
+      </button>
+
+      <button
+        type="button"
+        class="gallery__lightbox-prev"
+        data-gallery-prev
+        aria-label="{{ 'gallery.previous' | t }}"
+      >
+        {% render 'icon-arrow-left' %}
+      </button>
+
+      <button
+        type="button"
+        class="gallery__lightbox-next"
+        data-gallery-next
+        aria-label="{{ 'gallery.next' | t }}"
+      >
+        {% render 'icon-arrow-right' %}
+      </button>
+
+      <div class="gallery__lightbox-content">
+        <img
+          src=""
+          alt=""
+          class="gallery__lightbox-image"
+          data-gallery-lightbox-image
+        >
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .gallery {
+    width: 100%;
+  }
+
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    gap: var(--spacing);
+  }
+
+  .gallery__item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .gallery__image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .gallery__image-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  .gallery__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .gallery__image-button:hover .gallery__image {
+    transform: scale(1.05);
+  }
+
+  .gallery__caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    color: var(--color-background);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .gallery__lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .gallery__lightbox[data-gallery-lightbox-open] {
+    display: block;
+    opacity: 1;
+  }
+
+  .gallery__lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: var(--color-background);
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .gallery__lightbox-prev,
+  .gallery__lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 1rem;
+    border: none;
+    background: none;
+    color: var(--color-background);
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .gallery__lightbox-prev {
+    left: 1rem;
+  }
+
+  .gallery__lightbox-next {
+    right: 1rem;
+  }
+
+  .gallery__lightbox-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+  }
+
+  .gallery__lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  @media (max-width: 767px) {
+    .gallery__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gallery__lightbox-prev,
+    .gallery__lightbox-next {
+      padding: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  class ImageGallery {
+    constructor(element) {
+      this.element = element;
+      this.items = Array.from(element.querySelectorAll('[data-gallery-item]'));
+      this.lightbox = element.querySelector('[data-gallery-lightbox]');
+      this.lightboxImage = element.querySelector('[data-gallery-lightbox-image]');
+      this.currentIndex = 0;
+
+      this.init();
+    }
+
+    init() {
+      this.items.forEach((item, index) => {
+        item.addEventListener('click', () => this.openLightbox(index));
+      });
+
+      this.element.querySelector('[data-gallery-close]').addEventListener('click', () => this.closeLightbox());
+      this.element.querySelector('[data-gallery-prev]').addEventListener('click', () => this.prevImage());
+      this.element.querySelector('[data-gallery-next]').addEventListener('click', () => this.nextImage());
+
+      document.addEventListener('keydown', (event) => {
+        if (this.lightbox.hasAttribute('data-gallery-lightbox-open')) {
+          if (event.key === 'Escape') this.closeLightbox();
+          if (event.key === 'ArrowLeft') this.prevImage();
+          if (event.key === 'ArrowRight') this.nextImage();
+        }
+      });
+    }
+
+    openLightbox(index) {
+      this.currentIndex = index;
+      this.updateLightboxImage();
+      this.lightbox.setAttribute('data-gallery-lightbox-open', '');
+    }
+
+    closeLightbox() {
+      this.lightbox.removeAttribute('data-gallery-lightbox-open');
+    }
+
+    prevImage() {
+      this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
+      this.updateLightboxImage();
+    }
+
+    nextImage() {
+      this.currentIndex = (this.currentIndex + 1) % this.items.length;
+      this.updateLightboxImage();
+    }
+
+    updateLightboxImage() {
+      const image = this.items[this.currentIndex].querySelector('img');
+      this.lightboxImage.src = image.src;
+      this.lightboxImage.alt = image.alt;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const galleries = document.querySelectorAll('[data-gallery]');
+    galleries.forEach(gallery => new ImageGallery(gallery));
+  });
+</script> 

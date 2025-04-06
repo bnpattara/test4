@@ -1,0 +1,234 @@
+{% comment %}
+  Modal component
+  Accepts:
+  - id: {String} Unique ID for the modal
+  - size: {String} Modal size ('small', 'medium', 'large', 'full') (default: 'medium')
+  - show_close: {Boolean} Whether to show the close button (default: true)
+  - close_on_click_outside: {Boolean} Whether to close when clicking outside (default: true)
+  - close_on_escape: {Boolean} Whether to close when pressing escape (default: true)
+  - title: {String} Optional modal title
+  - content: {String} Modal content
+{% endcomment %}
+
+{% assign size = size | default: 'medium' %}
+{% assign show_close = show_close | default: true %}
+{% assign close_on_click_outside = close_on_click_outside | default: true %}
+{% assign close_on_escape = close_on_escape | default: true %}
+
+<div
+  class="modal"
+  data-modal
+  data-modal-id="{{ id }}"
+  {% if close_on_click_outside %}data-modal-close-on-outside{% endif %}
+  {% if close_on_escape %}data-modal-close-on-escape{% endif %}
+>
+  <div class="modal__overlay" data-modal-overlay></div>
+
+  <div class="modal__dialog modal__dialog--{{ size }}" role="dialog" aria-modal="true">
+    <div class="modal__content">
+      {% if title != blank %}
+        <div class="modal__header">
+          <h2 class="modal__title">
+            {{ title }}
+          </h2>
+        </div>
+      {% endif %}
+
+      {% if show_close %}
+        <button
+          type="button"
+          class="modal__close"
+          data-modal-close
+          aria-label="{{ 'modal.close' | t }}"
+        >
+          {% render 'icon-close' %}
+        </button>
+      {% endif %}
+
+      <div class="modal__body">
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .modal[data-modal-open] {
+    display: block;
+    opacity: 1;
+  }
+
+  .modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal__dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 100%;
+    max-height: 90vh;
+    background-color: var(--color-background);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .modal__dialog--small {
+    max-width: 400px;
+  }
+
+  .modal__dialog--medium {
+    max-width: 600px;
+  }
+
+  .modal__dialog--large {
+    max-width: 800px;
+  }
+
+  .modal__dialog--full {
+    width: 95%;
+    height: 95vh;
+  }
+
+  .modal__content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal__header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: var(--color-text);
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .modal__body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 767px) {
+    .modal__dialog {
+      width: 95%;
+    }
+
+    .modal__dialog--small,
+    .modal__dialog--medium,
+    .modal__dialog--large {
+      max-width: 100%;
+    }
+
+    .modal__header {
+      padding: 1rem;
+    }
+
+    .modal__body {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script>
+  class Modal {
+    constructor(element) {
+      this.element = element;
+      this.id = element.dataset.modalId;
+      this.overlay = element.querySelector('[data-modal-overlay]');
+      this.closeButton = element.querySelector('[data-modal-close]');
+      this.isOpen = false;
+
+      this.init();
+    }
+
+    init() {
+      if (this.element.dataset.modalCloseOnOutside) {
+        this.overlay.addEventListener('click', () => this.close());
+      }
+
+      if (this.element.dataset.modalCloseOnEscape) {
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && this.isOpen) {
+            this.close();
+          }
+        });
+      }
+
+      if (this.closeButton) {
+        this.closeButton.addEventListener('click', () => this.close());
+      }
+    }
+
+    open() {
+      this.isOpen = true;
+      this.element.setAttribute('data-modal-open', '');
+      document.body.style.overflow = 'hidden';
+    }
+
+    close() {
+      this.isOpen = false;
+      this.element.removeAttribute('data-modal-open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modals = document.querySelectorAll('[data-modal]');
+    modals.forEach(modal => new Modal(modal));
+  });
+
+  // Helper function to open a modal by ID
+  window.openModal = (id) => {
+    const modal = document.querySelector(`[data-modal-id="${id}"]`);
+    if (modal) {
+      new Modal(modal).open();
+    }
+  };
+
+  // Helper function to close a modal by ID
+  window.closeModal = (id) => {
+    const modal = document.querySelector(`[data-modal-id="${id}"]`);
+    if (modal) {
+      new Modal(modal).close();
+    }
+  };
+</script> 

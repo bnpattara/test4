@@ -1,0 +1,582 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "NatureBuff",
+    "theme_version": "1.0.0",
+    "theme_author": "NatureBuff",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Text"
+      },
+      {
+        "type": "color",
+        "id": "colors_text",
+        "label": "Text",
+        "default": "#1a1b18"
+      },
+      {
+        "type": "header",
+        "content": "Background"
+      },
+      {
+        "type": "color",
+        "id": "colors_background_1",
+        "label": "Background 1",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "colors_background_2",
+        "label": "Background 2",
+        "default": "#f3f3f3"
+      },
+      {
+        "type": "header",
+        "content": "Button Labels"
+      },
+      {
+        "type": "color",
+        "id": "colors_solid_button_labels",
+        "label": "Solid button labels",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "colors_outline_button_labels",
+        "label": "Outline button labels",
+        "default": "#1a1b18"
+      },
+      {
+        "type": "header",
+        "content": "Accent"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent_1",
+        "label": "Accent 1",
+        "default": "#0d9488"
+      },
+      {
+        "type": "color",
+        "id": "colors_accent_2",
+        "label": "Accent 2",
+        "default": "#0f766e"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "default": "assistant_n4",
+        "label": "Heading font",
+        "info": "Select a font for your headings"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "default": "assistant_n4",
+        "label": "Body font",
+        "info": "Select a font for your body text"
+      },
+      {
+        "type": "range",
+        "id": "heading_scale",
+        "min": 100,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Heading scale",
+        "default": 125
+      },
+      {
+        "type": "range",
+        "id": "body_scale",
+        "min": 100,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "label": "Body scale",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "select",
+        "id": "page_width",
+        "options": [
+          {
+            "value": "1600",
+            "label": "Wide"
+          },
+          {
+            "value": "1200",
+            "label": "Default"
+          },
+          {
+            "value": "1000",
+            "label": "Narrow"
+          }
+        ],
+        "default": "1200",
+        "label": "Page width"
+      },
+      {
+        "type": "range",
+        "id": "spacing_sections",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "px",
+        "label": "Spacing between sections",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "spacing_grid_vertical",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Vertical grid spacing",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "spacing_grid_horizontal",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Horizontal grid spacing",
+        "default": 20
+      }
+    ]
+  },
+  {
+    "name": "Media",
+    "settings": [
+      {
+        "type": "range",
+        "id": "media_padding",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Media padding",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Media border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Media border opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Media radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_shadow_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Media shadow opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_shadow_horizontal_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Media shadow horizontal offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_shadow_vertical_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Media shadow vertical offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "media_shadow_blur",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Media shadow blur",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Cards",
+    "settings": [
+      {
+        "type": "range",
+        "id": "card_image_padding",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Card image padding",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_corner_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Card corner radius",
+        "default": 0
+      },
+      {
+        "type": "select",
+        "id": "card_text_alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left",
+        "label": "Card text alignment"
+      },
+      {
+        "type": "range",
+        "id": "card_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Card border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Card border opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_shadow_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Card shadow opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_shadow_horizontal_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Card shadow horizontal offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_shadow_vertical_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Card shadow vertical offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "card_shadow_blur",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Card shadow blur",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "buttons_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Button radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Button border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Button border opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_shadow_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Button shadow opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_shadow_horizontal_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Button shadow horizontal offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_shadow_vertical_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Button shadow vertical offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "buttons_shadow_blur",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Button shadow blur",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Inputs",
+    "settings": [
+      {
+        "type": "range",
+        "id": "inputs_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Input radius",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "inputs_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Input border thickness",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "inputs_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Input border opacity",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "inputs_shadow_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Input shadow opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "inputs_shadow_horizontal_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Input shadow horizontal offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "inputs_shadow_vertical_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Input shadow vertical offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "inputs_shadow_blur",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Input shadow blur",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Variant Pills",
+    "settings": [
+      {
+        "type": "range",
+        "id": "variant_pills_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Variant pill radius",
+        "default": 40
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Variant pill border thickness",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Variant pill border opacity",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_shadow_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Variant pill shadow opacity",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_shadow_horizontal_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Variant pill shadow horizontal offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_shadow_vertical_offset",
+        "min": -50,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Variant pill shadow vertical offset",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "variant_pills_shadow_blur",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "px",
+        "label": "Variant pill shadow blur",
+        "default": 0
+      }
+    ]
+  }
+] 

@@ -1,0 +1,249 @@
+{% comment %}
+  Testimonials Section
+  Parameters:
+    - section: The section object containing all section settings
+{% endcomment %}
+
+{%- if section.settings.show_testimonials -%}
+  <div class="testimonials" data-section-id="{{ section.id }}">
+    <div class="testimonials__header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="testimonials__title">
+          {{ section.settings.title }}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.description != blank -%}
+        <div class="testimonials__description">
+          {{ section.settings.description }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="testimonials__grid">
+      {%- for block in section.blocks -%}
+        <div class="testimonials__item" {{ block.shopify_attributes }}>
+          <div class="testimonials__rating">
+            {%- for i in (1..5) -%}
+              {%- if i <= block.settings.rating -%}
+                {% render 'icon-star' %}
+              {%- else -%}
+                {% render 'icon-star-empty' %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if block.settings.content != blank -%}
+            <div class="testimonials__content">
+              {{ block.settings.content }}
+            </div>
+          {%- endif -%}
+          <div class="testimonials__author">
+            {%- if block.settings.author_image != blank -%}
+              <div class="testimonials__author-image">
+                <img
+                  src="{{ block.settings.author_image | image_url: width: 100 }}"
+                  alt="{{ block.settings.author_image.alt | escape }}"
+                  width="50"
+                  height="50"
+                  loading="lazy"
+                >
+              </div>
+            {%- endif -%}
+            <div class="testimonials__author-info">
+              {%- if block.settings.author_name != blank -%}
+                <div class="testimonials__author-name">
+                  {{ block.settings.author_name }}
+                </div>
+              {%- endif -%}
+              {%- if block.settings.author_title != blank -%}
+                <div class="testimonials__author-title">
+                  {{ block.settings.author_title }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_testimonials",
+      "label": "Show testimonials",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Read what our customers have to say about our products</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>This product is amazing! I've been using it for weeks and I can't imagine my life without it.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "author_image",
+          "label": "Author image"
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Author name",
+          "default": "John Doe"
+        },
+        {
+          "type": "text",
+          "id": "author_title",
+          "label": "Author title",
+          "default": "Verified Customer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+.testimonials {
+  padding: 4rem 0;
+  background-color: var(--color-base-background-2);
+}
+
+.testimonials__header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.testimonials__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.testimonials__description {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.testimonials__item {
+  background-color: var(--color-base-background-1);
+  border-radius: var(--media-radius);
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.testimonials__rating {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-base-accent-1);
+}
+
+.testimonials__content {
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.testimonials__author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.testimonials__author-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.testimonials__author-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.testimonials__author-name {
+  font-weight: bold;
+}
+
+.testimonials__author-title {
+  font-size: 0.875rem;
+  color: var(--color-base-text);
+  opacity: 0.7;
+}
+
+@media screen and (max-width: 749px) {
+  .testimonials {
+    padding: 2rem 0;
+  }
+
+  .testimonials__title {
+    font-size: 2rem;
+  }
+
+  .testimonials__description {
+    font-size: 1rem;
+  }
+
+  .testimonials__grid {
+    grid-template-columns: 1fr;
+  }
+}
+{% endstylesheet %} 

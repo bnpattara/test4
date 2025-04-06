@@ -1,0 +1,160 @@
+{% comment %}
+  Product Swatches
+  Parameters:
+    - option: The option object
+    - product: The product object
+    - selected_value: The currently selected value
+{% endcomment %}
+
+<div class="product-swatches" data-option="{{ option.name | handleize }}">
+  <div class="product-swatches__header">
+    <label class="product-swatches__label">{{ option.name }}</label>
+    <span class="product-swatches__selected">{{ selected_value }}</span>
+  </div>
+
+  <div class="product-swatches__list">
+    {% for value in option.values %}
+      {% assign swatch_value = value | handleize %}
+      {% assign swatch_image = value | handleize | append: '.png' | file_url %}
+      {% assign swatch_color = value | handleize | prepend: 'swatch-' %}
+      
+      <button
+        class="product-swatches__swatch"
+        data-value="{{ value | escape }}"
+        {% if value == selected_value %}aria-selected="true"{% endif %}
+        aria-label="{{ value }}"
+      >
+        {% if option.name == 'Color' or option.name == 'Colour' %}
+          <span
+            class="product-swatches__color"
+            style="background-color: {{ swatch_color }}"
+          ></span>
+        {% elsif option.name == 'Pattern' %}
+          <span
+            class="product-swatches__pattern"
+            style="background-image: url({{ swatch_image }})"
+          ></span>
+        {% else %}
+          <span class="product-swatches__text">{{ value }}</span>
+        {% endif %}
+      </button>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .product-swatches {
+    margin-bottom: var(--spacing-base);
+  }
+
+  .product-swatches__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-swatches__label {
+    font-weight: var(--font-weight-heading);
+  }
+
+  .product-swatches__selected {
+    color: var(--color-text-muted);
+  }
+
+  .product-swatches__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--spacing-base) / 2);
+  }
+
+  .product-swatches__swatch {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-small);
+    background: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .product-swatches__swatch[aria-selected="true"] {
+    border-color: var(--color-primary);
+  }
+
+  .product-swatches__swatch:hover {
+    border-color: var(--color-primary);
+  }
+
+  .product-swatches__color,
+  .product-swatches__pattern {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border-radius: calc(var(--border-radius-small) - 1px);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .product-swatches__text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+
+  .product-swatches__swatch[aria-selected="true"] .product-swatches__text {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .product-swatches__swatch {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productSwatches = document.querySelectorAll('.product-swatches');
+    if (!productSwatches.length) return;
+
+    productSwatches.forEach(swatches => {
+      const swatchButtons = swatches.querySelectorAll('.product-swatches__swatch');
+      const selectedValue = swatches.querySelector('.product-swatches__selected');
+
+      swatchButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const value = button.dataset.value;
+
+          // Update selected state
+          swatchButtons.forEach(btn => {
+            btn.setAttribute('aria-selected', btn === button ? 'true' : 'false');
+          });
+
+          // Update selected value display
+          if (selectedValue) {
+            selectedValue.textContent = value;
+          }
+
+          // Trigger variant change
+          const event = new CustomEvent('variantChange', {
+            detail: {
+              option: swatches.dataset.option,
+              value: value
+            }
+          });
+          document.dispatchEvent(event);
+        });
+      });
+    });
+  });
+</script> 

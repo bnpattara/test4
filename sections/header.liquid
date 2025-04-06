@@ -1,0 +1,242 @@
+{% comment %}
+  Header section
+  Accepts:
+  - logo: {Image} Logo image
+  - menu: {Linklist} Main menu
+  - search_enabled: {Boolean} Whether search is enabled
+  - cart_icon: {String} Cart icon
+{% endcomment %}
+
+<header class="header">
+  <div class="header__container">
+    <div class="header__left">
+      <button class="header__menu-button" data-menu-button>
+        <span class="visually-hidden">Menu</span>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      </button>
+      
+      <a href="{{ routes.root_url }}" class="header__logo">
+        {% if section.settings.logo != blank %}
+          {{ section.settings.logo | image_url: width: 200 | image_tag: loading: 'lazy' }}
+        {% else %}
+          {{ shop.name }}
+        {% endif %}
+      </a>
+    </div>
+
+    <nav class="header__nav" data-nav>
+      <ul class="header__menu">
+        {% for link in linklists[section.settings.menu].links %}
+          <li class="header__menu-item">
+            <a href="{{ link.url }}" class="header__menu-link">
+              {{ link.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="header__right">
+      {% if section.settings.search_enabled %}
+        <form action="{{ routes.search_url }}" method="get" class="header__search">
+          <input
+            type="search"
+            name="q"
+            placeholder="{{ 'general.search.placeholder' | t }}"
+            class="header__search-input"
+          >
+          <button type="submit" class="header__search-button">
+            <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+          </button>
+        </form>
+      {% endif %}
+
+      <a href="{{ routes.cart_url }}" class="header__cart">
+        <span class="visually-hidden">{{ 'general.cart.title' | t }}</span>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        <span class="header__cart-count" data-cart-count>
+          {{ cart.item_count }}
+        </span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+  }
+
+  .header__left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header__menu-button {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+
+  .header__logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .header__logo img {
+    max-height: 40px;
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .header__menu {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header__menu-link {
+    text-decoration: none;
+    color: var(--color-foreground);
+    padding: 0.5rem;
+  }
+
+  .header__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header__search {
+    display: flex;
+    align-items: center;
+  }
+
+  .header__search-input {
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    margin-right: 0.5rem;
+  }
+
+  .header__search-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+
+  .header__cart {
+    position: relative;
+    padding: 0.5rem;
+  }
+
+  .header__cart-count {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  @media (max-width: 768px) {
+    .header__menu-button {
+      display: block;
+    }
+
+    .header__nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: var(--color-background);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .header__nav[data-nav-open] {
+      transform: translateX(0);
+    }
+
+    .header__menu {
+      flex-direction: column;
+      padding: 2rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuButton = document.querySelector('[data-menu-button]');
+    const nav = document.querySelector('[data-nav]');
+    
+    menuButton.addEventListener('click', () => {
+      nav.toggleAttribute('data-nav-open');
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "search_enabled",
+      "label": "Enable search",
+      "default": true
+    }
+  ]
+}
+{% endschema %} 

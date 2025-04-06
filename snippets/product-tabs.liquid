@@ -1,0 +1,112 @@
+{% comment %}
+  Product Tabs
+  Parameters:
+    - product: The product object
+    - tabs: Array of tab objects with title and content
+{% endcomment %}
+
+<div class="product-tabs">
+  <div class="product-tabs__header">
+    {% for tab in tabs %}
+      <button
+        class="product-tabs__tab"
+        data-tab="{{ forloop.index }}"
+        {% if forloop.first %}aria-selected="true"{% endif %}
+      >
+        {{ tab.title }}
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="product-tabs__content">
+    {% for tab in tabs %}
+      <div
+        class="product-tabs__panel"
+        data-tab="{{ forloop.index }}"
+        {% if forloop.first %}aria-hidden="false"{% else %}aria-hidden="true"{% endif %}
+      >
+        {{ tab.content }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .product-tabs {
+    margin: var(--spacing-section) 0;
+  }
+
+  .product-tabs__header {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-base);
+  }
+
+  .product-tabs__tab {
+    padding: var(--spacing-base);
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-weight: var(--font-weight-heading);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .product-tabs__tab[aria-selected="true"] {
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-primary);
+  }
+
+  .product-tabs__tab:hover {
+    color: var(--color-text);
+  }
+
+  .product-tabs__panel {
+    display: none;
+  }
+
+  .product-tabs__panel[aria-hidden="false"] {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .product-tabs__header {
+      flex-direction: column;
+      border-bottom: none;
+    }
+
+    .product-tabs__tab {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .product-tabs__tab[aria-selected="true"] {
+      border-bottom: 2px solid var(--color-primary);
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productTabs = document.querySelector('.product-tabs');
+    if (!productTabs) return;
+
+    const tabs = productTabs.querySelectorAll('.product-tabs__tab');
+    const panels = productTabs.querySelectorAll('.product-tabs__panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabIndex = tab.dataset.tab;
+
+        // Update tab states
+        tabs.forEach(t => {
+          t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        });
+
+        // Update panel states
+        panels.forEach(panel => {
+          panel.setAttribute('aria-hidden', panel.dataset.tab === tabIndex ? 'false' : 'true');
+        });
+      });
+    });
+  });
+</script> 

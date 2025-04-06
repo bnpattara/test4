@@ -1,0 +1,217 @@
+{% comment %}
+  Product Quick View
+  Parameters:
+    - product: The product object
+    - show_vendor: Boolean to show vendor
+    - show_quantity: Boolean to show quantity selector
+{% endcomment %}
+
+<div class="product-quick-view" data-product-id="{{ product.id }}">
+  <div class="product-quick-view__gallery">
+    {% if product.featured_image %}
+      <img
+        src="{{ product.featured_image | img_url: '400x' }}"
+        alt="{{ product.featured_image.alt | escape }}"
+        loading="lazy"
+        width="400"
+        height="{{ 400 | divided_by: product.featured_image.aspect_ratio | ceil }}"
+      >
+    {% endif %}
+  </div>
+
+  <div class="product-quick-view__info">
+    <h3 class="product-quick-view__title">{{ product.title }}</h3>
+
+    {% if show_vendor %}
+      <div class="product-quick-view__vendor">{{ product.vendor }}</div>
+    {% endif %}
+
+    <div class="product-quick-view__price">
+      {% if product.compare_at_price > product.price %}
+        <span class="product-quick-view__price-compare">{{ product.compare_at_price | money }}</span>
+      {% endif %}
+      <span class="product-quick-view__price-current">{{ product.price | money }}</span>
+    </div>
+
+    {% form 'product', product, class: 'product-quick-view__form' %}
+      {% if product.variants.size > 1 %}
+        <div class="product-quick-view__variants">
+          {% for option in product.options_with_values %}
+            <div class="product-quick-view__variant">
+              <label for="Quick-{{ product.id }}-{{ option.name }}">
+                {{ option.name }}
+              </label>
+              <select
+                id="Quick-{{ product.id }}-{{ option.name }}"
+                name="options[{{ option.name | escape }}]"
+                class="product-quick-view__variant-select"
+              >
+                {% for value in option.values %}
+                  <option value="{{ value | escape }}">
+                    {{ value }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if show_quantity %}
+        <div class="product-quick-view__quantity">
+          <label for="Quick-Quantity-{{ product.id }}">Quantity</label>
+          <input
+            type="number"
+            id="Quick-Quantity-{{ product.id }}"
+            name="quantity"
+            value="1"
+            min="1"
+            class="product-quick-view__quantity-input"
+          >
+        </div>
+      {% endif %}
+
+      <button
+        type="submit"
+        name="add"
+        class="button button--primary product-quick-view__add-to-cart"
+        {% unless product.available %}disabled{% endunless %}
+      >
+        {% if product.available %}
+          Add to Cart
+        {% else %}
+          Sold Out
+        {% endif %}
+      </button>
+    {% endform %}
+
+    <a href="{{ product.url }}" class="product-quick-view__view-details">
+      View full details
+    </a>
+  </div>
+</div>
+
+<style>
+  .product-quick-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-base);
+    padding: var(--spacing-base);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .product-quick-view__gallery img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-medium);
+  }
+
+  .product-quick-view__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-base);
+  }
+
+  .product-quick-view__title {
+    margin: 0;
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-heading);
+  }
+
+  .product-quick-view__vendor {
+    color: var(--color-text-muted);
+  }
+
+  .product-quick-view__price {
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-heading);
+  }
+
+  .product-quick-view__price-compare {
+    margin-right: var(--spacing-base);
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .product-quick-view__variants {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-base);
+  }
+
+  .product-quick-view__variant label {
+    display: block;
+    margin-bottom: calc(var(--spacing-base) / 2);
+  }
+
+  .product-quick-view__variant-select {
+    width: 100%;
+    padding: calc(var(--spacing-base) / 2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .product-quick-view__quantity {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-base) / 2);
+  }
+
+  .product-quick-view__quantity-input {
+    width: 100px;
+    padding: calc(var(--spacing-base) / 2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .product-quick-view__add-to-cart {
+    width: 100%;
+  }
+
+  .product-quick-view__view-details {
+    text-align: center;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .product-quick-view__view-details:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .product-quick-view {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const quickViewButtons = document.querySelectorAll('[data-quick-view]');
+    const modal = document.querySelector('.modal');
+    
+    if (!quickViewButtons.length || !modal) return;
+
+    quickViewButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const productId = button.dataset.productId;
+        
+        try {
+          const response = await fetch(`/products/${productId}?view=quick-view`);
+          const html = await response.text();
+          
+          modal.innerHTML = html;
+          modal.show();
+        } catch (error) {
+          console.error('Error loading quick view:', error);
+        }
+      });
+    });
+  });
+</script> 

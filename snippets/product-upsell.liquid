@@ -1,0 +1,127 @@
+{% comment %}
+  Product Upsell
+  Parameters:
+    - product: The current product object
+    - related_products: Array of related products
+    - cross_sell_products: Array of cross-sell products
+    - bundle_products: Array of bundle products
+    - title: Section title (default: "You may also like")
+    - limit: Number of products to show (default: 4)
+{% endcomment %}
+
+{% assign title = title | default: "You may also like" %}
+{% assign limit = limit | default: 4 %}
+
+<div class="product-upsell">
+  {% if related_products and related_products.size > 0 %}
+    <div class="product-upsell__section">
+      <h3 class="product-upsell__title">{{ title }}</h3>
+      <div class="product-upsell__grid">
+        {% for related_product in related_products limit: limit %}
+          {% render 'product-card', product: related_product %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if cross_sell_products and cross_sell_products.size > 0 %}
+    <div class="product-upsell__section">
+      <h3 class="product-upsell__title">Frequently bought together</h3>
+      <div class="product-upsell__grid">
+        {% for cross_sell_product in cross_sell_products limit: limit %}
+          {% render 'product-card', product: cross_sell_product %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if bundle_products and bundle_products.size > 0 %}
+    <div class="product-upsell__section">
+      <h3 class="product-upsell__title">Complete the bundle</h3>
+      <div class="product-upsell__grid">
+        {% for bundle_product in bundle_products limit: limit %}
+          {% render 'product-card', product: bundle_product %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .product-upsell {
+    margin-top: calc(var(--spacing-base) * 2);
+  }
+
+  .product-upsell__section {
+    margin-bottom: calc(var(--spacing-base) * 2);
+  }
+
+  .product-upsell__title {
+    margin-bottom: var(--spacing-base);
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-heading);
+    text-align: center;
+  }
+
+  .product-upsell__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-base);
+  }
+
+  @media (max-width: 768px) {
+    .product-upsell__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-upsell__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productUpsell = document.querySelector('.product-upsell');
+    if (!productUpsell) return;
+
+    // Fetch related products if not provided
+    if (!productUpsell.querySelector('.product-upsell__section')) {
+      const productId = {{ product.id | json }};
+      const limit = {{ limit | json }};
+
+      fetch(`/recommendations/products.json?product_id=${productId}&limit=${limit}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.products && data.products.length > 0) {
+            const section = document.createElement('div');
+            section.className = 'product-upsell__section';
+            section.innerHTML = `
+              <h3 class="product-upsell__title">{{ title }}</h3>
+              <div class="product-upsell__grid">
+                ${data.products.map(product => `
+                  <div class="product-card">
+                    <a href="${product.url}" class="product-card__link">
+                      <div class="product-card__image">
+                        <img src="${product.featured_image}" alt="${product.title}">
+                      </div>
+                      <div class="product-card__content">
+                        <h3 class="product-card__title">${product.title}</h3>
+                        <div class="product-card__price">
+                          ${product.price}
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+            productUpsell.appendChild(section);
+          }
+        })
+        .catch(error => console.error('Error fetching recommendations:', error));
+    }
+  });
+</script> 

@@ -1,0 +1,90 @@
+{% comment %}
+  Product Badges
+  Parameters:
+    - product: The product object
+    - show_sale: Boolean to show sale badge
+    - show_new: Boolean to show new badge
+    - show_sold_out: Boolean to show sold out badge
+    - show_custom: Boolean to show custom badges
+    - custom_badges: Array of custom badge objects with text and color
+{% endcomment %}
+
+<div class="product-badges">
+  {% if show_sale and product.compare_at_price > product.price %}
+    <span class="product-badges__badge product-badges__badge--sale">
+      Sale
+      {% assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+      ({{ discount }}% off)
+    </span>
+  {% endif %}
+
+  {% if show_new and product.created_at > date | minus: 30 | date: '%s' %}
+    <span class="product-badges__badge product-badges__badge--new">New</span>
+  {% endif %}
+
+  {% if show_sold_out and product.available == false %}
+    <span class="product-badges__badge product-badges__badge--sold-out">Sold Out</span>
+  {% endif %}
+
+  {% if show_custom and custom_badges %}
+    {% for badge in custom_badges %}
+      <span
+        class="product-badges__badge product-badges__badge--custom"
+        style="background-color: {{ badge.color }}"
+      >
+        {{ badge.text }}
+      </span>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<style>
+  .product-badges {
+    position: absolute;
+    top: var(--spacing-base);
+    left: var(--spacing-base);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-base) / 2);
+    z-index: 1;
+  }
+
+  .product-badges__badge {
+    display: inline-block;
+    padding: calc(var(--spacing-base) / 4) calc(var(--spacing-base) / 2);
+    border-radius: var(--border-radius-small);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-heading);
+    color: var(--color-background);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .product-badges__badge--sale {
+    background-color: var(--color-error);
+  }
+
+  .product-badges__badge--new {
+    background-color: var(--color-success);
+  }
+
+  .product-badges__badge--sold-out {
+    background-color: var(--color-text-muted);
+  }
+
+  .product-badges__badge--custom {
+    /* Custom badge styles are applied inline */
+  }
+
+  @media (max-width: 768px) {
+    .product-badges {
+      top: calc(var(--spacing-base) / 2);
+      left: calc(var(--spacing-base) / 2);
+    }
+
+    .product-badges__badge {
+      font-size: 0.625rem;
+      padding: calc(var(--spacing-base) / 6) calc(var(--spacing-base) / 3);
+    }
+  }
+</style> 

@@ -1,0 +1,107 @@
+{% comment %}
+  Slider component
+  Accepts:
+  - class: {String} Additional classes to add to the slider
+  - id: {String} Unique identifier for the slider
+  - min: {Number} Minimum value
+  - max: {Number} Maximum value
+  - step: {Number} Step value
+  - value: {Number} Current value
+  - disabled: {Boolean} Whether the slider is disabled
+{% endcomment %}
+
+<div class="slider-wrapper {{ class }}" data-slider-wrapper>
+  <div class="slider-track">
+    <div class="slider-range" style="width: {{ value | divided_by: max | times: 100 }}%"></div>
+  </div>
+  <input
+    type="range"
+    class="slider-input"
+    id="{{ id }}"
+    name="{{ id }}"
+    min="{{ min }}"
+    max="{{ max }}"
+    step="{{ step }}"
+    value="{{ value }}"
+    {% if disabled %}disabled{% endif %}
+    data-slider-input
+  >
+  <div class="slider-thumb" data-slider-thumb></div>
+</div>
+
+<style>
+  .slider-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .slider-track {
+    position: relative;
+    height: 8px;
+    width: 100%;
+    background-color: var(--color-secondary);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .slider-range {
+    position: absolute;
+    height: 100%;
+    background-color: var(--color-primary);
+  }
+
+  .slider-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .slider-thumb {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    background-color: var(--color-background);
+    border: 2px solid var(--color-primary);
+    border-radius: 9999px;
+    pointer-events: none;
+    transition: transform 0.2s;
+  }
+
+  .slider-input:focus-visible + .slider-thumb {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  .slider-input:disabled + .slider-thumb {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sliders = document.querySelectorAll('[data-slider-wrapper]');
+    
+    sliders.forEach(slider => {
+      const input = slider.querySelector('[data-slider-input]');
+      const thumb = slider.querySelector('[data-slider-thumb]');
+      
+      function updateThumbPosition() {
+        const value = input.value;
+        const min = input.min;
+        const max = input.max;
+        const percentage = ((value - min) / (max - min)) * 100;
+        thumb.style.left = `${percentage}%`;
+      }
+      
+      input.addEventListener('input', updateThumbPosition);
+      updateThumbPosition();
+    });
+  });
+</script> 

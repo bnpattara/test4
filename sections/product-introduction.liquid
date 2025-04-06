@@ -1,0 +1,236 @@
+{% comment %}
+  Product Introduction Section
+  Parameters:
+    - section: The section object containing all section settings
+{% endcomment %}
+
+{%- if section.settings.show_product_intro -%}
+  <div class="product-intro" data-section-id="{{ section.id }}">
+    <div class="product-intro__header">
+      {%- if section.settings.title != blank -%}
+        <h2 class="product-intro__title">
+          {{ section.settings.title }}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.description != blank -%}
+        <div class="product-intro__description">
+          {{ section.settings.description }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="product-intro__grid">
+      {%- for block in section.blocks -%}
+        <div class="product-intro__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <div class="product-intro__image">
+              <img
+                src="{{ block.settings.image | image_url: width: 600 }}"
+                alt="{{ block.settings.image.alt | escape }}"
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+                loading="lazy"
+              >
+            </div>
+          {%- endif -%}
+          <div class="product-intro__content">
+            {%- if block.settings.title != blank -%}
+              <h3 class="product-intro__item-title">
+                {{ block.settings.title }}
+              </h3>
+            {%- endif -%}
+            {%- if block.settings.description != blank -%}
+              <div class="product-intro__item-description">
+                {{ block.settings.description }}
+              </div>
+            {%- endif -%}
+            {%- if block.settings.button_text != blank and block.settings.button_url != blank -%}
+              <a href="{{ block.settings.button_url }}" class="product-intro__button">
+                {{ block.settings.button_text }}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product Introduction",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_product_intro",
+      "label": "Show product introduction",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Our Products"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Discover our range of high-quality products</p>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Product Name"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Product description goes here</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Button URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Introduction",
+      "blocks": [
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+.product-intro {
+  padding: 4rem 0;
+}
+
+.product-intro__header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.product-intro__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.product-intro__description {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.product-intro__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.product-intro__item {
+  background-color: var(--color-base-background-1);
+  border-radius: var(--media-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.product-intro__item:hover {
+  transform: translateY(-5px);
+}
+
+.product-intro__image {
+  position: relative;
+  padding-top: 75%;
+}
+
+.product-intro__image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-intro__content {
+  padding: 2rem;
+}
+
+.product-intro__item-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.product-intro__item-description {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.product-intro__button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-base-accent-1);
+  color: var(--color-base-solid-button-labels);
+  text-decoration: none;
+  border-radius: var(--buttons-radius);
+  transition: background-color 0.3s ease;
+}
+
+.product-intro__button:hover {
+  background-color: var(--color-base-accent-2);
+}
+
+@media screen and (max-width: 749px) {
+  .product-intro {
+    padding: 2rem 0;
+  }
+
+  .product-intro__title {
+    font-size: 2rem;
+  }
+
+  .product-intro__description {
+    font-size: 1rem;
+  }
+
+  .product-intro__grid {
+    grid-template-columns: 1fr;
+  }
+}
+{% endstylesheet %} 
