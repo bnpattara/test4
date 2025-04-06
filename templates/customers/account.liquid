@@ -1,0 +1,443 @@
+{% comment %}
+  Account dashboard template
+  Accepts:
+  - customer: {Customer} The customer object
+  - orders: {Array} Array of customer orders
+  - addresses: {Array} Array of customer addresses
+  - default_address: {Address} Customer's default address
+{% endcomment %}
+
+<div class="account">
+  <div class="account__container">
+    <div class="account__content">
+      <header class="account__header">
+        <h1 class="account__title">
+          {{ 'customer.account.title' | t }}
+        </h1>
+
+        <div class="account__welcome">
+          {{ 'customer.account.welcome' | t: name: customer.first_name }}
+        </div>
+      </header>
+
+      <div class="account__sections">
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.orders.title' | t }}
+          </h2>
+
+          {% if customer.orders.size > 0 %}
+            <div class="account__orders">
+              {% for order in customer.orders %}
+                <div class="account__order">
+                  <div class="account__order-header">
+                    <div class="account__order-meta">
+                      <span class="account__order-number">
+                        {{ 'customer.orders.order_number' | t: number: order.order_number }}
+                      </span>
+                      <span class="account__order-date">
+                        {{ order.created_at | date: format: 'date' }}
+                      </span>
+                    </div>
+
+                    <div class="account__order-status">
+                      {{ order.financial_status_label }}
+                    </div>
+                  </div>
+
+                  <div class="account__order-items">
+                    {% for line_item in order.line_items %}
+                      <div class="account__order-item">
+                        <div class="account__order-item-image">
+                          {% if line_item.image %}
+                            <img
+                              src="{{ line_item.image | image_url: width: 100 }}"
+                              alt="{{ line_item.title | escape }}"
+                              width="100"
+                              height="100"
+                              loading="lazy"
+                            >
+                          {% endif %}
+                        </div>
+
+                        <div class="account__order-item-details">
+                          <div class="account__order-item-title">
+                            {{ line_item.title }}
+                          </div>
+
+                          <div class="account__order-item-meta">
+                            <span class="account__order-item-price">
+                              {{ line_item.price | money }}
+                            </span>
+                            <span class="account__order-item-quantity">
+                              {{ 'customer.orders.quantity' | t: quantity: line_item.quantity }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                  <div class="account__order-footer">
+                    <div class="account__order-total">
+                      {{ 'customer.orders.total' | t }}: {{ order.total_price | money_with_currency }}
+                    </div>
+
+                    <a
+                      href="{{ order.customer_url }}"
+                      class="account__order-link"
+                    >
+                      {{ 'customer.orders.view_details' | t }}
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="account__empty">
+              {{ 'customer.orders.none' | t }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="account__section">
+          <div class="account__section-header">
+            <h2 class="account__section-title">
+              {{ 'customer.addresses.title' | t }}
+            </h2>
+
+            <button
+              type="button"
+              class="account__section-action"
+              onclick="window.location.href='{{ routes.account_addresses_url }}'"
+            >
+              {{ 'customer.addresses.manage' | t }}
+            </button>
+          </div>
+
+          {% if customer.default_address %}
+            <div class="account__address">
+              {{ customer.default_address | format_address }}
+            </div>
+          {% else %}
+            <div class="account__empty">
+              {{ 'customer.addresses.none' | t }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.account.details' | t }}
+          </h2>
+
+          <div class="account__details">
+            <div class="account__detail">
+              <span class="account__detail-label">
+                {{ 'customer.account.name' | t }}
+              </span>
+              <span class="account__detail-value">
+                {{ customer.name }}
+              </span>
+            </div>
+
+            <div class="account__detail">
+              <span class="account__detail-label">
+                {{ 'customer.account.email' | t }}
+              </span>
+              <span class="account__detail-value">
+                {{ customer.email }}
+              </span>
+            </div>
+
+            <div class="account__actions">
+              <a
+                href="{{ routes.account_logout_url }}"
+                class="account__action"
+              >
+                {{ 'customer.account.logout' | t }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .account {
+    padding: 2rem 0;
+  }
+
+  .account__container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .account__content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .account__header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .account__title {
+    margin: 0 0 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .account__welcome {
+    color: var(--color-muted);
+  }
+
+  .account__sections {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .account__section {
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-background);
+  }
+
+  .account__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .account__section-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .account__section-action {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .account__section-action:hover {
+    background-color: var(--color-background-alt);
+  }
+
+  .account__orders {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .account__order {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+  }
+
+  .account__order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .account__order-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .account__order-number {
+    font-weight: 500;
+  }
+
+  .account__order-date {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .account__order-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    background-color: var(--color-background-alt);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .account__order-items {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .account__order-item {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .account__order-item-image {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  .account__order-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .account__order-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .account__order-item-title {
+    font-weight: 500;
+  }
+
+  .account__order-item-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .account__order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .account__order-total {
+    font-weight: 500;
+  }
+
+  .account__order-link {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .account__order-link:hover {
+    color: var(--color-primary-hover);
+  }
+
+  .account__address {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .account__details {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .account__detail {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .account__detail:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .account__detail-label {
+    color: var(--color-muted);
+  }
+
+  .account__detail-value {
+    font-weight: 500;
+  }
+
+  .account__actions {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .account__action {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .account__action:hover {
+    background-color: var(--color-background-alt);
+  }
+
+  .account__empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 768px) {
+    .account__sections {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .account__title {
+      font-size: 1.75rem;
+    }
+
+    .account__section {
+      padding: 1.5rem;
+    }
+
+    .account__order-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .account__order-footer {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Account Dashboard",
+  "settings": []
+}
+{% endschema %} 

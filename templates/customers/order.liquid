@@ -1,0 +1,417 @@
+{% comment %}
+  Order template
+  Accepts:
+  - order: {Order} The order object
+  - customer: {Customer} The customer object
+{% endcomment %}
+
+<div class="account">
+  <div class="account__container">
+    <div class="account__content">
+      <header class="account__header">
+        <h1 class="account__title">
+          {{ 'customer.order.title' | t: number: order.order_number }}
+        </h1>
+
+        <div class="account__meta">
+          <span class="account__meta-item">
+            {{ 'customer.order.date' | t }}: {{ order.created_at | date: format: 'date' }}
+          </span>
+          <span class="account__meta-item">
+            {{ 'customer.order.status' | t }}: {{ order.financial_status_label }}
+          </span>
+          <span class="account__meta-item">
+            {{ 'customer.order.fulfillment_status' | t }}: {{ order.fulfillment_status_label }}
+          </span>
+        </div>
+
+        <a
+          href="{{ routes.account_url }}"
+          class="account__back"
+        >
+          {{ 'customer.order.return_to_account' | t }}
+        </a>
+      </header>
+
+      <div class="account__sections">
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.order.items' | t }}
+          </h2>
+
+          <div class="account__order-items">
+            {% for line_item in order.line_items %}
+              <div class="account__order-item">
+                <div class="account__order-item-image">
+                  {% if line_item.image %}
+                    <img
+                      src="{{ line_item.image | image_url: width: 200 }}"
+                      alt="{{ line_item.title | escape }}"
+                      width="200"
+                      height="200"
+                      loading="lazy"
+                    >
+                  {% endif %}
+                </div>
+
+                <div class="account__order-item-details">
+                  <div class="account__order-item-title">
+                    {{ line_item.title }}
+                  </div>
+
+                  {% if line_item.variant.title != 'Default Title' %}
+                    <div class="account__order-item-variant">
+                      {{ line_item.variant.title }}
+                    </div>
+                  {% endif %}
+
+                  <div class="account__order-item-meta">
+                    <span class="account__order-item-price">
+                      {{ line_item.price | money }}
+                    </span>
+                    <span class="account__order-item-quantity">
+                      {{ 'customer.order.quantity' | t }}: {{ line_item.quantity }}
+                    </span>
+                  </div>
+
+                  {% if line_item.line_price %}
+                    <div class="account__order-item-total">
+                      {{ 'customer.order.total' | t }}: {{ line_item.line_price | money }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="account__order-totals">
+            <div class="account__order-total">
+              <span class="account__order-total-label">
+                {{ 'customer.order.subtotal' | t }}
+              </span>
+              <span class="account__order-total-value">
+                {{ order.subtotal_price | money }}
+              </span>
+            </div>
+
+            {% for discount in order.discounts %}
+              <div class="account__order-total">
+                <span class="account__order-total-label">
+                  {{ discount.code }}
+                </span>
+                <span class="account__order-total-value">
+                  -{{ discount.savings | money }}
+                </span>
+              </div>
+            {% endfor %}
+
+            {% for shipping_method in order.shipping_methods %}
+              <div class="account__order-total">
+                <span class="account__order-total-label">
+                  {{ shipping_method.title }}
+                </span>
+                <span class="account__order-total-value">
+                  {{ shipping_method.price | money }}
+                </span>
+              </div>
+            {% endfor %}
+
+            {% for tax_line in order.tax_lines %}
+              <div class="account__order-total">
+                <span class="account__order-total-label">
+                  {{ tax_line.title }} ({{ tax_line.rate | times: 100 }}%)
+                </span>
+                <span class="account__order-total-value">
+                  {{ tax_line.price | money }}
+                </span>
+              </div>
+            {% endfor %}
+
+            <div class="account__order-total account__order-total--grand">
+              <span class="account__order-total-label">
+                {{ 'customer.order.total' | t }}
+              </span>
+              <span class="account__order-total-value">
+                {{ order.total_price | money_with_currency }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.order.shipping_address' | t }}
+          </h2>
+
+          <div class="account__address">
+            {{ order.shipping_address | format_address }}
+          </div>
+        </div>
+
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.order.billing_address' | t }}
+          </h2>
+
+          <div class="account__address">
+            {{ order.billing_address | format_address }}
+          </div>
+        </div>
+
+        <div class="account__section">
+          <h2 class="account__section-title">
+            {{ 'customer.order.payment' | t }}
+          </h2>
+
+          <div class="account__payment">
+            <div class="account__payment-method">
+              {{ order.payment_gateway.name }}
+            </div>
+
+            {% if order.transactions.size > 0 %}
+              <div class="account__payment-transactions">
+                {% for transaction in order.transactions %}
+                  <div class="account__payment-transaction">
+                    <span class="account__payment-transaction-date">
+                      {{ transaction.created_at | date: format: 'date' }}
+                    </span>
+                    <span class="account__payment-transaction-status">
+                      {{ transaction.status_label }}
+                    </span>
+                    <span class="account__payment-transaction-amount">
+                      {{ transaction.amount | money }}
+                    </span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .account {
+    padding: 2rem 0;
+  }
+
+  .account__container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .account__content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .account__header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .account__title {
+    margin: 0 0 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .account__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: var(--color-muted);
+  }
+
+  .account__back {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .account__back:hover {
+    color: var(--color-primary-hover);
+  }
+
+  .account__sections {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .account__section {
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-background);
+  }
+
+  .account__section-title {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .account__order-items {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .account__order-item {
+    display: flex;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .account__order-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .account__order-item-image {
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  .account__order-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .account__order-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .account__order-item-title {
+    font-weight: 500;
+  }
+
+  .account__order-item-variant {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .account__order-item-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .account__order-item-total {
+    font-weight: 500;
+  }
+
+  .account__order-totals {
+    display: grid;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .account__order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .account__order-total--grand {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    font-weight: 600;
+  }
+
+  .account__address {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .account__payment {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .account__payment-method {
+    font-weight: 500;
+  }
+
+  .account__payment-transactions {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .account__payment-transaction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+  }
+
+  .account__payment-transaction-date {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .account__payment-transaction-status {
+    font-weight: 500;
+  }
+
+  .account__payment-transaction-amount {
+    font-weight: 500;
+  }
+
+  @media (min-width: 768px) {
+    .account__sections {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .account__title {
+      font-size: 1.75rem;
+    }
+
+    .account__section {
+      padding: 1.5rem;
+    }
+
+    .account__order-item {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .account__order-item-image {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Order",
+  "settings": []
+}
+{% endschema %} 

@@ -1,0 +1,340 @@
+{% comment %}
+  Contact form template
+  Accepts:
+  - form_errors: {Object} Form validation errors
+  - form_success: {Boolean} Whether the form was submitted successfully
+{% endcomment %}
+
+<div class="contact">
+  <div class="contact__container">
+    <div class="contact__content">
+      <header class="contact__header">
+        <h1 class="contact__title">
+          {{ page.title }}
+        </h1>
+
+        {% if page.content != blank %}
+          <div class="contact__description">
+            {{ page.content }}
+          </div>
+        {% endif %}
+      </header>
+
+      <div class="contact__form-container">
+        {% if form_success %}
+          <div class="contact__success">
+            <div class="contact__success-icon">
+              {% render 'icon-check' %}
+            </div>
+            <h2 class="contact__success-title">
+              {{ 'contact.form.success_title' | t }}
+            </h2>
+            <p class="contact__success-message">
+              {{ 'contact.form.success_message' | t }}
+            </p>
+            <a
+              href="{{ routes.root_url }}"
+              class="contact__success-button"
+            >
+              {{ 'contact.form.return_home' | t }}
+            </a>
+          </div>
+        {% else %}
+          {% form 'contact', class: 'contact__form' %}
+            {% if form.errors %}
+              <div class="contact__errors">
+                <h2 class="contact__errors-title">
+                  {{ 'contact.form.error_title' | t }}
+                </h2>
+                <ul class="contact__errors-list">
+                  {% for error in form.errors %}
+                    <li class="contact__errors-item">
+                      {{ form.errors.messages[error] }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            <div class="contact__fields">
+              <div class="contact__field">
+                <label
+                  for="ContactFormName"
+                  class="contact__label"
+                >
+                  {{ 'contact.form.name' | t }}
+                </label>
+                <input
+                  type="text"
+                  id="ContactFormName"
+                  name="contact[name]"
+                  class="contact__input"
+                  value="{{ form.name }}"
+                  required
+                >
+              </div>
+
+              <div class="contact__field">
+                <label
+                  for="ContactFormEmail"
+                  class="contact__label"
+                >
+                  {{ 'contact.form.email' | t }}
+                </label>
+                <input
+                  type="email"
+                  id="ContactFormEmail"
+                  name="contact[email]"
+                  class="contact__input"
+                  value="{{ form.email }}"
+                  required
+                >
+              </div>
+
+              <div class="contact__field">
+                <label
+                  for="ContactFormSubject"
+                  class="contact__label"
+                >
+                  {{ 'contact.form.subject' | t }}
+                </label>
+                <input
+                  type="text"
+                  id="ContactFormSubject"
+                  name="contact[subject]"
+                  class="contact__input"
+                  value="{{ form.subject }}"
+                  required
+                >
+              </div>
+
+              <div class="contact__field">
+                <label
+                  for="ContactFormMessage"
+                  class="contact__label"
+                >
+                  {{ 'contact.form.message' | t }}
+                </label>
+                <textarea
+                  id="ContactFormMessage"
+                  name="contact[body]"
+                  class="contact__textarea"
+                  rows="6"
+                  required
+                >{{ form.body }}</textarea>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="contact__submit"
+            >
+              {{ 'contact.form.send' | t }}
+            </button>
+          {% endform %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .contact {
+    padding: 4rem 0;
+  }
+
+  .contact__container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .contact__content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .contact__header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .contact__title {
+    margin: 0 0 1rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .contact__description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .contact__form-container {
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 2rem;
+  }
+
+  .contact__form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .contact__fields {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .contact__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .contact__label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .contact__input,
+  .contact__textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+
+  .contact__input:focus,
+  .contact__textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .contact__textarea {
+    resize: vertical;
+    min-height: 150px;
+  }
+
+  .contact__submit {
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .contact__submit:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .contact__errors {
+    padding: 1rem;
+    border: 1px solid var(--color-error);
+    border-radius: 0.375rem;
+    background-color: var(--color-error-light);
+  }
+
+  .contact__errors-title {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-error);
+  }
+
+  .contact__errors-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .contact__errors-item {
+    font-size: 0.875rem;
+    color: var(--color-error);
+  }
+
+  .contact__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding: 2rem;
+  }
+
+  .contact__success-icon {
+    width: 3rem;
+    height: 3rem;
+    color: var(--color-success);
+  }
+
+  .contact__success-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .contact__success-message {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+
+  .contact__success-button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .contact__success-button:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+  }
+
+  @media (min-width: 768px) {
+    .contact__fields {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .contact__field:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact__title {
+      font-size: 2rem;
+    }
+
+    .contact__form-container {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Contact",
+  "settings": []
+}
+{% endschema %} 

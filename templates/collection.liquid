@@ -1,0 +1,349 @@
+{% comment %}
+  Collection Template
+  Parameters:
+    - collection: The collection object
+    - section: The section object containing all section settings
+{% endcomment %}
+
+<div class="collection" data-section-id="{{ section.id }}">
+  <div class="collection__header">
+    <h1 class="collection__title">
+      {{ collection.title }}
+    </h1>
+    {%- if collection.description != blank -%}
+      <div class="collection__description">
+        {{ collection.description }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="collection__filters">
+    <div class="collection__filter-group">
+      <button class="collection__filter-button" data-filter="all">
+        All Products
+      </button>
+      {%- for tag in collection.all_tags -%}
+        <button class="collection__filter-button" data-filter="{{ tag | handleize }}">
+          {{ tag }}
+        </button>
+      {%- endfor -%}
+    </div>
+    <div class="collection__sort">
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by" class="collection__sort-select">
+        <option value="manual">Featured</option>
+        <option value="price-ascending">Price: Low to High</option>
+        <option value="price-descending">Price: High to Low</option>
+        <option value="title-ascending">Alphabetically: A-Z</option>
+        <option value="title-descending">Alphabetically: Z-A</option>
+        <option value="created-ascending">Date: Old to New</option>
+        <option value="created-descending">Date: New to Old</option>
+        <option value="best-selling">Best Selling</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="collection__grid">
+    {%- for product in collection.products -%}
+      <div class="collection__product" data-tags="{{ product.tags | join: ' ' | handleize }}">
+        {% render 'product-card', product: product %}
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if paginate.pages > 1 -%}
+    <div class="collection__pagination">
+      {{ paginate | default_pagination }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_collection_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filtering",
+      "label": "Show filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sorting",
+      "label": "Show sorting",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "label": "Products per page",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "grid_columns",
+      "label": "Grid columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "3",
+          "label": "3 columns"
+        },
+        {
+          "value": "4",
+          "label": "4 columns"
+        }
+      ],
+      "default": "4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection"
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+.collection {
+  padding: 4rem 0;
+}
+
+.collection__header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.collection__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.collection__description {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.collection__filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--color-base-background-1);
+  border-radius: var(--media-radius);
+}
+
+.collection__filter-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.collection__filter-button {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 1px solid var(--color-base-text);
+  border-radius: var(--buttons-radius);
+  color: var(--color-base-text);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.collection__filter-button:hover,
+.collection__filter-button.active {
+  background-color: var(--color-base-accent-1);
+  color: var(--color-base-solid-button-labels);
+  border-color: var(--color-base-accent-1);
+}
+
+.collection__sort {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.collection__sort-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-base-text);
+  border-radius: var(--buttons-radius);
+  background-color: var(--color-base-background-1);
+  color: var(--color-base-text);
+}
+
+.collection__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.collection__pagination {
+  text-align: center;
+}
+
+.collection__pagination .pagination {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.collection__pagination .pagination__item {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-base-text);
+  border-radius: var(--buttons-radius);
+  color: var(--color-base-text);
+  text-decoration: none;
+}
+
+.collection__pagination .pagination__item.active {
+  background-color: var(--color-base-accent-1);
+  color: var(--color-base-solid-button-labels);
+  border-color: var(--color-base-accent-1);
+}
+
+@media screen and (max-width: 989px) {
+  .collection__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .collection {
+    padding: 2rem 0;
+  }
+
+  .collection__title {
+    font-size: 2rem;
+  }
+
+  .collection__description {
+    font-size: 1rem;
+  }
+
+  .collection__filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .collection__filter-group {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .collection__sort {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .collection__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+{% endstylesheet %}
+
+{% javascript %}
+class CollectionFilters extends HTMLElement {
+  constructor() {
+    super();
+    this.filterButtons = this.querySelectorAll('.collection__filter-button');
+    this.products = this.querySelectorAll('.collection__product');
+    this.sortSelect = this.querySelector('.collection__sort-select');
+    this.init();
+  }
+
+  init() {
+    this.setupFiltering();
+    this.setupSorting();
+  }
+
+  setupFiltering() {
+    this.filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        this.filterProducts(filter);
+        this.updateActiveButton(button);
+      });
+    });
+  }
+
+  setupSorting() {
+    this.sortSelect.addEventListener('change', () => {
+      const sortValue = this.sortSelect.value;
+      this.sortProducts(sortValue);
+    });
+  }
+
+  filterProducts(filter) {
+    this.products.forEach(product => {
+      if (filter === 'all' || product.dataset.tags.includes(filter)) {
+        product.style.display = '';
+      } else {
+        product.style.display = 'none';
+      }
+    });
+  }
+
+  updateActiveButton(activeButton) {
+    this.filterButtons.forEach(button => {
+      button.classList.remove('active');
+    });
+    activeButton.classList.add('active');
+  }
+
+  sortProducts(sortValue) {
+    const products = Array.from(this.products);
+    const grid = this.querySelector('.collection__grid');
+
+    products.sort((a, b) => {
+      const aPrice = parseFloat(a.querySelector('.product-card__price').dataset.price);
+      const bPrice = parseFloat(b.querySelector('.product-card__price').dataset.price);
+      const aTitle = a.querySelector('.product-card__title').textContent;
+      const bTitle = b.querySelector('.product-card__title').textContent;
+      const aDate = new Date(a.querySelector('.product-card__date').dataset.date);
+      const bDate = new Date(b.querySelector('.product-card__date').dataset.date);
+
+      switch (sortValue) {
+        case 'price-ascending':
+          return aPrice - bPrice;
+        case 'price-descending':
+          return bPrice - aPrice;
+        case 'title-ascending':
+          return aTitle.localeCompare(bTitle);
+        case 'title-descending':
+          return bTitle.localeCompare(aTitle);
+        case 'created-ascending':
+          return aDate - bDate;
+        case 'created-descending':
+          return bDate - aDate;
+        default:
+          return 0;
+      }
+    });
+
+    products.forEach(product => {
+      grid.appendChild(product);
+    });
+  }
+}
+
+customElements.define('collection-filters', CollectionFilters);
+{% endjavascript %} 

@@ -1,0 +1,369 @@
+{% comment %}
+  Login template
+  Accepts:
+  - form_errors: {Object} Form errors
+  - recover_success: {Boolean} Whether recovery was successful
+  - reset_success: {Boolean} Whether password reset was successful
+  - show_register: {Boolean} Whether to show registration form
+  - show_recover: {Boolean} Whether to show password recovery form
+{% endcomment %}
+
+{% assign show_register = show_register | default: section.settings.show_register %}
+{% assign show_recover = show_recover | default: section.settings.show_recover %}
+
+<div class="account">
+  <div class="account__container">
+    <div class="account__content">
+      <header class="account__header">
+        <h1 class="account__title">
+          {{ 'customer.login.title' | t }}
+        </h1>
+      </header>
+
+      {% if form_errors %}
+        <div class="account__errors">
+          {% for error in form_errors %}
+            <div class="account__error">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if recover_success %}
+        <div class="account__success">
+          {{ 'customer.recover.success' | t }}
+        </div>
+      {% endif %}
+
+      {% if reset_success %}
+        <div class="account__success">
+          {{ 'customer.reset_password.success' | t }}
+        </div>
+      {% endif %}
+
+      <div class="account__forms">
+        <div class="account__form account__form--login">
+          <h2 class="account__form-title">
+            {{ 'customer.login.sign_in' | t }}
+          </h2>
+
+          {% form 'customer_login' %}
+            <div class="account__form-group">
+              <label for="customer_email" class="account__form-label">
+                {{ 'customer.login.email' | t }}
+              </label>
+              <input
+                type="email"
+                name="customer[email]"
+                id="customer_email"
+                class="account__form-input"
+                required
+              >
+            </div>
+
+            <div class="account__form-group">
+              <label for="customer_password" class="account__form-label">
+                {{ 'customer.login.password' | t }}
+              </label>
+              <input
+                type="password"
+                name="customer[password]"
+                id="customer_password"
+                class="account__form-input"
+                required
+              >
+            </div>
+
+            <div class="account__form-actions">
+              <button type="submit" class="account__form-submit">
+                {{ 'customer.login.sign_in' | t }}
+              </button>
+
+              {% if show_recover %}
+                <a href="#recover" class="account__form-link">
+                  {{ 'customer.login.forgot_password' | t }}
+                </a>
+              {% endif %}
+            </div>
+          {% endform %}
+        </div>
+
+        {% if show_register %}
+          <div class="account__form account__form--register">
+            <h2 class="account__form-title">
+              {{ 'customer.register.title' | t }}
+            </h2>
+
+            {% form 'create_customer' %}
+              <div class="account__form-group">
+                <label for="first_name" class="account__form-label">
+                  {{ 'customer.register.first_name' | t }}
+                </label>
+                <input
+                  type="text"
+                  name="customer[first_name]"
+                  id="first_name"
+                  class="account__form-input"
+                  required
+                >
+              </div>
+
+              <div class="account__form-group">
+                <label for="last_name" class="account__form-label">
+                  {{ 'customer.register.last_name' | t }}
+                </label>
+                <input
+                  type="text"
+                  name="customer[last_name]"
+                  id="last_name"
+                  class="account__form-input"
+                  required
+                >
+              </div>
+
+              <div class="account__form-group">
+                <label for="email" class="account__form-label">
+                  {{ 'customer.register.email' | t }}
+                </label>
+                <input
+                  type="email"
+                  name="customer[email]"
+                  id="email"
+                  class="account__form-input"
+                  required
+                >
+              </div>
+
+              <div class="account__form-group">
+                <label for="password" class="account__form-label">
+                  {{ 'customer.register.password' | t }}
+                </label>
+                <input
+                  type="password"
+                  name="customer[password]"
+                  id="password"
+                  class="account__form-input"
+                  required
+                >
+              </div>
+
+              <div class="account__form-actions">
+                <button type="submit" class="account__form-submit">
+                  {{ 'customer.register.submit' | t }}
+                </button>
+              </div>
+            {% endform %}
+          </div>
+        {% endif %}
+
+        {% if show_recover %}
+          <div id="recover" class="account__form account__form--recover">
+            <h2 class="account__form-title">
+              {{ 'customer.recover.title' | t }}
+            </h2>
+
+            {% form 'recover_customer_password' %}
+              <div class="account__form-group">
+                <label for="recover_email" class="account__form-label">
+                  {{ 'customer.recover.email' | t }}
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="recover_email"
+                  class="account__form-input"
+                  required
+                >
+              </div>
+
+              <div class="account__form-actions">
+                <button type="submit" class="account__form-submit">
+                  {{ 'customer.recover.submit' | t }}
+                </button>
+
+                <a href="#login" class="account__form-link">
+                  {{ 'customer.recover.cancel' | t }}
+                </a>
+              </div>
+            {% endform %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .account {
+    padding: 2rem 0;
+  }
+
+  .account__container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .account__content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .account__header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .account__title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .account__errors {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--color-error);
+    border-radius: 0.375rem;
+    background-color: var(--color-error-background);
+    color: var(--color-error);
+  }
+
+  .account__error {
+    margin-bottom: 0.5rem;
+  }
+
+  .account__error:last-child {
+    margin-bottom: 0;
+  }
+
+  .account__success {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--color-success);
+    border-radius: 0.375rem;
+    background-color: var(--color-success-background);
+    color: var(--color-success);
+  }
+
+  .account__forms {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .account__form {
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-background);
+  }
+
+  .account__form-title {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .account__form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .account__form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .account__form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .account__form-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+
+  .account__form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .account__form-submit {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .account__form-submit:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .account__form-link {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .account__form-link:hover {
+    background-color: var(--color-background-alt);
+  }
+
+  @media (min-width: 768px) {
+    .account__forms {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .account__title {
+      font-size: 1.75rem;
+    }
+
+    .account__form {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Login",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_register",
+      "label": "Show Registration Form",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recover",
+      "label": "Show Password Recovery",
+      "default": true
+    }
+  ]
+}
+{% endschema %} 

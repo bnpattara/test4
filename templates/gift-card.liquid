@@ -1,0 +1,312 @@
+{% comment %}
+  Gift card template
+  Accepts:
+  - gift_card: {GiftCard} The gift card object
+  - show_balance: {Boolean} Whether to show balance
+  - show_expiry: {Boolean} Whether to show expiry date
+  - show_qr_code: {Boolean} Whether to show QR code
+  - show_print: {Boolean} Whether to show print button
+{% endcomment %}
+
+{% assign show_balance = show_balance | default: section.settings.show_balance %}
+{% assign show_expiry = show_expiry | default: section.settings.show_expiry %}
+{% assign show_qr_code = show_qr_code | default: section.settings.show_qr_code %}
+{% assign show_print = show_print | default: section.settings.show_print %}
+
+<div class="gift-card">
+  <div class="gift-card__container">
+    <div class="gift-card__content">
+      <header class="gift-card__header">
+        <h1 class="gift-card__title">
+          {{ 'gift_card.title' | t }}
+        </h1>
+
+        <div class="gift-card__code">
+          <span class="gift-card__code-label">
+            {{ 'gift_card.code' | t }}
+          </span>
+          <span class="gift-card__code-value">
+            {{ gift_card.code | format_code }}
+          </span>
+        </div>
+      </header>
+
+      <div class="gift-card__details">
+        {% if show_balance %}
+          <div class="gift-card__balance">
+            <span class="gift-card__balance-label">
+              {{ 'gift_card.balance' | t }}
+            </span>
+            <span class="gift-card__balance-value">
+              {{ gift_card.balance | money_with_currency }}
+            </span>
+          </div>
+        {% endif %}
+
+        {% if show_expiry and gift_card.expires_on %}
+          <div class="gift-card__expiry">
+            <span class="gift-card__expiry-label">
+              {{ 'gift_card.expires' | t }}
+            </span>
+            <span class="gift-card__expiry-value">
+              {{ gift_card.expires_on | date: format: 'date' }}
+            </span>
+          </div>
+        {% endif %}
+      </div>
+
+      {% if show_qr_code %}
+        <div class="gift-card__qr">
+          <img
+            src="{{ gift_card.qr_identifier | qr_code_url }}"
+            alt="{{ 'gift_card.qr_alt' | t }}"
+            width="200"
+            height="200"
+            loading="lazy"
+          >
+        </div>
+      {% endif %}
+
+      <div class="gift-card__actions">
+        <a
+          href="{{ shop.url }}"
+          class="gift-card__action gift-card__action--shop"
+        >
+          {{ 'gift_card.shop' | t }}
+        </a>
+
+        {% if show_print %}
+          <button
+            type="button"
+            class="gift-card__action gift-card__action--print"
+            onclick="window.print();"
+          >
+            {{ 'gift_card.print' | t }}
+          </button>
+        {% endif %}
+      </div>
+
+      <div class="gift-card__instructions">
+        <h2 class="gift-card__instructions-title">
+          {{ 'gift_card.instructions_title' | t }}
+        </h2>
+
+        <ol class="gift-card__instructions-list">
+          <li class="gift-card__instructions-item">
+            {{ 'gift_card.instructions_1' | t }}
+          </li>
+          <li class="gift-card__instructions-item">
+            {{ 'gift_card.instructions_2' | t }}
+          </li>
+          <li class="gift-card__instructions-item">
+            {{ 'gift_card.instructions_3' | t }}
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gift-card {
+    padding: 2rem 0;
+  }
+
+  .gift-card__container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .gift-card__content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-background);
+    text-align: center;
+  }
+
+  .gift-card__header {
+    margin-bottom: 2rem;
+  }
+
+  .gift-card__title {
+    margin: 0 0 1rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .gift-card__code {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-background-alt);
+  }
+
+  .gift-card__code-label {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .gift-card__code-value {
+    font-family: monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  .gift-card__details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .gift-card__balance,
+  .gift-card__expiry {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .gift-card__balance-label,
+  .gift-card__expiry-label {
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .gift-card__balance-value,
+  .gift-card__expiry-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .gift-card__qr {
+    margin-bottom: 2rem;
+  }
+
+  .gift-card__qr img {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+  }
+
+  .gift-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .gift-card__action {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .gift-card__action--shop {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  .gift-card__action--shop:hover {
+    background-color: var(--color-background-alt);
+  }
+
+  .gift-card__action--print {
+    border: none;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    cursor: pointer;
+  }
+
+  .gift-card__action--print:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .gift-card__instructions {
+    text-align: left;
+  }
+
+  .gift-card__instructions-title {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+  }
+
+  .gift-card__instructions-list {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .gift-card__instructions-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .gift-card__instructions-item:last-child {
+    margin-bottom: 0;
+  }
+
+  @media print {
+    .gift-card__action--print {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .gift-card__title {
+      font-size: 1.75rem;
+    }
+
+    .gift-card__code-value {
+      font-size: 1.25rem;
+    }
+
+    .gift-card__content {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Gift Card",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_balance",
+      "label": "Show Balance",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_expiry",
+      "label": "Show Expiry Date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_qr_code",
+      "label": "Show QR Code",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_print",
+      "label": "Show Print Button",
+      "default": true
+    }
+  ]
+}
+{% endschema %} 
